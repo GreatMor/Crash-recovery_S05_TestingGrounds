@@ -4,7 +4,7 @@
 #include "ChooseNextPoints.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
-#include "PatrolRoute.h"
+#include "NPS/Component/PatrolRoute.h"
 #include "BehaviorTree/BehaviorTreeTypes.h "
 
 EBTNodeResult::Type UChooseNextPoints::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
