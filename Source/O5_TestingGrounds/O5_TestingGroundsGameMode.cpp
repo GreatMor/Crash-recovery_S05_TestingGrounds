@@ -2,7 +2,7 @@
 
 #include "O5_TestingGroundsGameMode.h"
 #include "O5_TestingGroundsHUD.h"
-#include "O5_TestingGroundsCharacter.h"
+#include "Player/FirstPersonCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AO5_TestingGroundsGameMode::AO5_TestingGroundsGameMode()
