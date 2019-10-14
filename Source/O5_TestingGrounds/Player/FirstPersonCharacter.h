@@ -7,15 +7,17 @@
 #include "FirstPersonCharacter.generated.h"
 
 class UInputComponent;
+class AGun;
+
 
 UCLASS(config=Game)
 class AFirstPersonCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+		
 	///** Pawn mesh: 1st person view (arms; seen only by self) */
-	//UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	//class USkeletalMeshComponent* Mesh1P;
+	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
+	class USkeletalMeshComponent* Mesh1P;
 
 	/** Gun mesh: VR view (attached to the VR controller directly, no arm, just the actual gun) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -37,13 +39,17 @@ class AFirstPersonCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
-public:
-	AFirstPersonCharacter();
-
 protected:
 	virtual void BeginPlay();
 
+
 public:
+
+	AFirstPersonCharacter();
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AGun>Gun_BP;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -60,6 +66,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
+private:
+		AGun* Gun = nullptr;
 protected:
 	
 	///** Fires a projectile. */

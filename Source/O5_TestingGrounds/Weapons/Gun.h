@@ -11,8 +11,8 @@ class AGun : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	class USkeletalMeshComponent* Mesh1P;
+	//UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
+	//class USkeletalMeshComponent* Mesh1P;
 
 	/** Gun mesh: 1st person view (seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -24,8 +24,6 @@ class AGun : public AActor
 
 public:
 	AGun();
-
-	virtual void BeginPlay();
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
