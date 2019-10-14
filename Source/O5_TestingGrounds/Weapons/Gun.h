@@ -41,7 +41,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimInstance* AnimInstance;
 
-protected:
 	/** Fires a projectile. */
 	void OnFire();
 
