@@ -4,6 +4,8 @@
 #include "Tiel.h"
 #include "Math/UnrealMathUtility.h"
 #include "HAL/Platform.h"
+#include "Engine/World.h"
+#include "Engine/EngineTypes.h"
 
 // Sets default values
 ATiel::ATiel()
@@ -13,17 +15,21 @@ ATiel::ATiel()
 
 }
 
-void ATiel::PlaceActor()
+void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn)
 {
 	FVector Min(0, -2000, 0);//	Size Relative to Pivot
 	FVector Max(4000, 2000, 0);//	Max size BP_Tile
 
 	FBox Bounds(Min, Max);
 
+	int NumberToSpawn = FMath::FRandRange(MinSpawn, MaxSpawn);
+
 	for (size_t i = 0; i < 5; i++)
 	{
 		FVector SpawnPoint = FMath::RandPointInBox(Bounds); // 
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Point %s"), *SpawnPoint.ToCompactString());
+		AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpown);
+		Spawned->SetActorRelativeLocation(SpawnPoint);
+		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 	}
 }
 
