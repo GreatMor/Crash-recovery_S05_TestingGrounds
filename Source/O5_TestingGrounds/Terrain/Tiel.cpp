@@ -6,6 +6,7 @@
 #include "HAL/Platform.h"
 #include "Engine/World.h"
 #include "Engine/EngineTypes.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ATiel::ATiel()
@@ -37,7 +38,8 @@ void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn)
 void ATiel::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CastSphere(GetActorLocation(), 300);
+	CastSphere(GetActorLocation() + FVector(0, 0, 1000),300);
 }
 
 // Called every frame
@@ -45,5 +47,30 @@ void ATiel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool ATiel::CastSphere(FVector Location, float Radius)
+{
+	FHitResult HitResult;
+	bool HasHit = GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Location,
+		Location + Radius,
+		FQuat::Identity,
+		ECollisionChannel::ECC_Camera,
+		FCollisionShape::MakeSphere(Radius)
+	);
+
+	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
+	DrawDebugSphere(
+		GetWorld(),
+		Location,
+		Radius,
+		20,
+		ResultColor,
+		true, 100);
+
+	UE_LOG(LogTemp, Warning, TEXT("Collor %i ;"), HasHit)
+	return !HasHit;
 }
 
