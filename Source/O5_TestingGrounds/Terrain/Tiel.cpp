@@ -39,7 +39,7 @@ void ATiel::BeginPlay()
 {
 	Super::BeginPlay();
 	CastSphere(GetActorLocation(), 300);
-	CastSphere(GetActorLocation() + FVector(0, 0, 1000),300);
+
 }
 
 // Called every frame
@@ -57,20 +57,23 @@ bool ATiel::CastSphere(FVector Location, float Radius)
 		Location,
 		Location + Radius,
 		FQuat::Identity,
-		ECollisionChannel::ECC_Camera,
+		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
 	);
 
+	UE_LOG(LogTemp, Warning, TEXT("HitResult %s ;"), *HitResult.ToString())
+
 	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
-	DrawDebugSphere(
+	DrawDebugCapsule(
 		GetWorld(),
 		Location,
+		0,
 		Radius,
-		20,
+		FQuat::Identity,
 		ResultColor,
-		true, 100);
-
-	UE_LOG(LogTemp, Warning, TEXT("Collor %i ;"), HasHit)
-	return !HasHit;
+		true, 
+		100);
+	
+	return HasHit;
 }
 
