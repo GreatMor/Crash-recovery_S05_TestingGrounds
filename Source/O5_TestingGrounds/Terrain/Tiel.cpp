@@ -16,30 +16,51 @@ ATiel::ATiel()
 
 }
 
-void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn)
+void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn, float Radius)
 {
-	FVector Min(0, -2000, 0);//	Size Relative to Pivot
-	FVector Max(4000, 2000, 0);//	Max size BP_Tile
-
-	FBox Bounds(Min, Max);
-
 	int NumberToSpawn = FMath::FRandRange(MinSpawn, MaxSpawn);
 
 	for (size_t i = 0; i < 5; i++)
 	{
-		FVector SpawnPoint = FMath::RandPointInBox(Bounds); // 
-		AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpown);
-		Spawned->SetActorRelativeLocation(SpawnPoint);
-		Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+		FVector SpawnPoint;
+		bool found = FindEmtyLocation(SpawnPoint, Radius);
+
+		if (found)
+		{
+			PlaceActor(ToSpown, SpawnPoint);
+		}
 	}
+}
+bool ATiel::FindEmtyLocation(FVector& OutLocation, float Radius)
+{
+	FVector Min(0, -2000, 0);//	Size Relative to Pivot
+	FVector Max(4000, 2000, 0);//	Max size BP_Tile
+	FBox Bounds(Min, Max);
+	const int MAX_ATTEMPTS = 100;
+	
+	for (size_t i = 0; i < MAX_ATTEMPTS; i++)
+	{
+		FVector CandidatePoint = FMath::RandPointInBox(Bounds);
+		if (CanSpawnAtLocation(CandidatePoint, Radius))
+		{
+			OutLocation = CandidatePoint;
+			return true;
+		}		
+	}
+	return false;
+}
+
+void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint)
+{
+	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpown);
+	Spawned->SetActorRelativeLocation(SpawnPoint);
+	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 }
 
 // Called when the game starts or when spawned
 void ATiel::BeginPlay()
 {
 	Super::BeginPlay();
-	CastSphere(GetActorLocation(), 300);
-
 }
 
 // Called every frame
@@ -49,7 +70,7 @@ void ATiel::Tick(float DeltaTime)
 
 }
 
-bool ATiel::CastSphere(FVector Location, float Radius)
+bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
 	bool HasHit = GetWorld()->SweepSingleByChannel(
@@ -74,6 +95,6 @@ bool ATiel::CastSphere(FVector Location, float Radius)
 		true, 
 		100);
 	
-	return HasHit;
+	return !HasHit;
 }
 
