@@ -8,6 +8,7 @@
 #include "Engine/EngineTypes.h"
 #include "DrawDebugHelpers.h"
 
+
 // Sets default values
 ATiel::ATiel()
 {
@@ -63,7 +64,7 @@ void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint, float Ro
 // Called when the game starts or when spawned
 void ATiel::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 }
 
 // Called every frame
