@@ -4,7 +4,12 @@
 #include "InfiniteTerraingGameMode.h"
 #include "Runtime/NavigationSystem/Public/NavMesh/NavMeshBoundsVolume.h"
 #include "EngineUtils.h"
+#include "ActorPool.h"
 
+AInfiniteTerraingGameMode::AInfiniteTerraingGameMode()
+{
+	NavMeshBoundsVolumePool = CreateDefaultSubobject<UActorPool>("NavMeshBoundsVolume");
+}
 void AInfiniteTerraingGameMode::PopulateBoundsVolumePool()
 {
 	auto VolumeIterator = TActorIterator<ANavMeshBoundsVolume>(GetWorld());

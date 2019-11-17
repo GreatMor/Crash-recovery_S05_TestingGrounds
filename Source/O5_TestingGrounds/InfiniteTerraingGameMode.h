@@ -15,10 +15,19 @@ class O5_TESTINGGROUNDS_API AInfiniteTerraingGameMode : public AO5_TestingGround
 	GENERATED_BODY()
 	
 public:
+
+	AInfiniteTerraingGameMode();
+
 	UFUNCTION(BlueprintCallable, Category = "Bounds Pool")
 	void PopulateBoundsVolumePool();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pool")
+	class UActorPool* NavMeshBoundsVolumePool;
+
 
 private:
 	void AddToPool(class ANavMeshBoundsVolume* VolumeToAdd);
 
 };
+  

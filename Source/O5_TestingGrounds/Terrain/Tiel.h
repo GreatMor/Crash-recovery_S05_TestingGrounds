@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Tiel.generated.h"
 
+class UActorPool;
+
 UCLASS()
 class O5_TESTINGGROUNDS_API ATiel : public AActor
 {
@@ -26,6 +28,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Pool")
+	void SetPool(UActorPool* Pool);
+
 private:
 	bool FindEmtyLocation(FVector& OutLocation, float Radius);
 
@@ -33,4 +38,5 @@ private:
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
+	UActorPool* Pool;
 };
