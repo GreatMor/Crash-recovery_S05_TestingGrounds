@@ -86,16 +86,16 @@ bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 		FCollisionShape::MakeSphere(Radius)
 	);
 
-	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
-	DrawDebugCapsule(
-		GetWorld(),
-		GlobalLocation,
-		0,
-		Radius,
-		FQuat::Identity,
-		ResultColor,
-		true, 
-		100);
+	//FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
+	//DrawDebugCapsule(
+	//	GetWorld(),
+	//	GlobalLocation,
+	//	0,
+	//	Radius,
+	//	FQuat::Identity,
+	//	ResultColor,
+	//	true, 
+	//	100);
 	
 	return !HasHit;
 }
