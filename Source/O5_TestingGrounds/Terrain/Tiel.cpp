@@ -13,21 +13,22 @@ ATiel::ATiel()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
-void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn, float Radius)
+void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale)
 {
 	int NumberToSpawn = FMath::FRandRange(MinSpawn, MaxSpawn);
 
-	for (size_t i = 0; i < 5; i++)
+	for (size_t i = 0; i < NumberToSpawn; i++)
 	{
 		FVector SpawnPoint;
-		bool found = FindEmtyLocation(SpawnPoint, Radius);
-
+		float RandomScale = FMath::RandRange(MinScale, MaxScale);
+		
+		bool found = FindEmtyLocation(SpawnPoint, Radius * RandomScale);
 		if (found)
 		{
-			PlaceActor(ToSpown, SpawnPoint);
+			float RandomRotation = FMath::RandRange(-180.f, 180.f);
+			PlaceActor(ToSpown, SpawnPoint, RandomRotation, RandomScale);
 		}
 	}
 }
@@ -50,11 +51,13 @@ bool ATiel::FindEmtyLocation(FVector& OutLocation, float Radius)
 	return false;
 }
 
-void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint)
+void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint, float Rotation, float Scale)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpown);
 	Spawned->SetActorRelativeLocation(SpawnPoint);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+	Spawned->SetActorRotation(FRotator(0, Rotation, 0));
+	Spawned->SetActorScale3D(FVector(Scale,Scale,Scale));
 }
 
 // Called when the game starts or when spawned
@@ -67,27 +70,26 @@ void ATiel::BeginPlay()
 void ATiel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 {
 	FHitResult HitResult;
+	FVector GlobalLocation = ActorToWorld().TransformPosition(Location);
+
 	bool HasHit = GetWorld()->SweepSingleByChannel(
 		HitResult,
-		Location,
-		Location + Radius,
+		GlobalLocation,
+		GlobalLocation + Radius,
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
 	);
 
-	UE_LOG(LogTemp, Warning, TEXT("HitResult %s ;"), *HitResult.ToString())
-
 	FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
 	DrawDebugCapsule(
 		GetWorld(),
-		Location,
+		GlobalLocation,
 		0,
 		Radius,
 		FQuat::Identity,
