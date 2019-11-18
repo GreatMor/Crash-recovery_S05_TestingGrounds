@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 	void PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpaw=1, int MaxSpawn=1, float Radius = 500, float MinScale = 1, float MaxScale = 1);
 
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, int MinSpaw = 1, int MaxSpawn = 1, float Radius = 500);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -61,6 +64,8 @@ private:
 	bool FindEmtyLocation(FVector& OutLocation, float Radius);
 
 	void PlaceActor(TSubclassOf<AActor> ToSpown, FSpawnPosition SpawnPosition);
+
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpown, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
