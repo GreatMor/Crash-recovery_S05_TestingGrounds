@@ -15,12 +15,30 @@ ATiel::ATiel()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	MinExtend = FVector(0, -2000, 0);
+	MaxExtend = FVector(4000, 2000, 0);
 }
 
 void ATiel::SetPool(UActorPool* InPool)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[%s] Setting Pool %s"), *(this->GetName()), *(InPool->GetName()));
+	//UE_LOG(LogTemp, Warning, TEXT("[%s] Setting Pool %s"), *(this->GetName()), *(InPool->GetName()));
 	Pool = InPool;
+	
+	PositionNavMeshBoundsVolume();
+}
+
+void ATiel::PositionNavMeshBoundsVolume()
+{
+	NavMeshBoundsVolume = Pool->Checkout();
+	
+	if (NavMeshBoundsVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[%s] Not enough actors in pool."), *GetName());
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("[%s] Checked out: {%s}"), *GetName(), *NavMeshBoundsVolume->GetName());
+	NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
 }
 
 void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale)
@@ -40,11 +58,10 @@ void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn,
 		}
 	}
 }
+
 bool ATiel::FindEmtyLocation(FVector& OutLocation, float Radius)
 {
-	FVector Min(0, -2000, 0);//	Size Relative to Pivot
-	FVector Max(4000, 2000, 0);//	Max size BP_Tile
-	FBox Bounds(Min, Max);
+	FBox Bounds(MinExtend, MaxExtend);
 	const int MAX_ATTEMPTS = 100;
 	
 	for (size_t i = 0; i < MAX_ATTEMPTS; i++)
@@ -67,11 +84,9 @@ void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint, float Ro
 	Spawned->SetActorRotation(FRotator(0, Rotation, 0));
 	Spawned->SetActorScale3D(FVector(Scale,Scale,Scale));
 }
-
-// Called when the game starts or when spawned
 void ATiel::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 }
 
 // Called every frame
@@ -79,6 +94,12 @@ void ATiel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void ATiel::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Pool->Return(NavMeshBoundsVolume);
+}
+
 
 bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 {
@@ -107,4 +128,5 @@ bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 	
 	return !HasHit;
 }
+
 

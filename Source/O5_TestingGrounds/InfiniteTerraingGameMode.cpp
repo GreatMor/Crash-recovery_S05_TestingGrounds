@@ -22,5 +22,5 @@ void AInfiniteTerraingGameMode::PopulateBoundsVolumePool()
 
 void AInfiniteTerraingGameMode::AddToPool(ANavMeshBoundsVolume* VolumeToAdd)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fond Actor : %s "), *VolumeToAdd->GetName());
+	NavMeshBoundsVolumePool->Add(VolumeToAdd);
 }
