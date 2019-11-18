@@ -6,6 +6,7 @@
 #include "HAL/Platform.h"
 #include "Engine/World.h"
 #include "Engine/EngineTypes.h"
+#include "NavigationSystem.h"
 #include "DrawDebugHelpers.h"
 #include "ActorPool.h"
 
@@ -24,14 +25,14 @@ void ATiel::SetPool(UActorPool* InPool)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("[%s] Setting Pool %s"), *(this->GetName()), *(InPool->GetName()));
 	Pool = InPool;
-	
-	PositionNavMeshBoundsVolume();
+
+	PositionNavMeshBoundsVolume(); 
 }
 
 void ATiel::PositionNavMeshBoundsVolume()
 {
 	NavMeshBoundsVolume = Pool->Checkout();
-	
+
 	if (NavMeshBoundsVolume == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[%s] Not enough actors in pool."), *GetName());
@@ -39,24 +40,40 @@ void ATiel::PositionNavMeshBoundsVolume()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("[%s] Checked out: {%s}"), *GetName(), *NavMeshBoundsVolume->GetName());
 	NavMeshBoundsVolume->SetActorLocation(GetActorLocation());
+
 }
 
-void ATiel::PlaceActors(TSubclassOf<AActor> ToSpown, int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale)
+void ATiel::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn , int MaxSpawn, float Radius , float MinScale, float MaxScale)
 {
+	TArray<FSpawnPosition> SpawnPositions= RandomSpawnPosition(MinSpawn, MaxSpawn, Radius,  MinScale, MaxScale);
+		for (FSpawnPosition SpawnPosition : SpawnPositions)
+		{
+			PlaceActor(ToSpawn, SpawnPosition);
+		}
+	
+}
+
+TArray<FSpawnPosition> ATiel::RandomSpawnPosition(int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale)
+{
+	TArray<FSpawnPosition> SpawnPositions;
+
 	int NumberToSpawn = FMath::FRandRange(MinSpawn, MaxSpawn);
 
 	for (size_t i = 0; i < NumberToSpawn; i++)
 	{
-		FVector SpawnPoint;
-		float RandomScale = FMath::RandRange(MinScale, MaxScale);
-		
-		bool found = FindEmtyLocation(SpawnPoint, Radius * RandomScale);
+
+		FSpawnPosition SpawnPosition;
+		SpawnPosition.Scale = FMath::RandRange(MinScale, MaxScale);
+
+		bool found = FindEmtyLocation(SpawnPosition.Location, Radius * SpawnPosition.Scale);
 		if (found)
 		{
-			float RandomRotation = FMath::RandRange(-180.f, 180.f);
-			PlaceActor(ToSpown, SpawnPoint, RandomRotation, RandomScale);
-		}
+			SpawnPosition.Rotation = FMath::RandRange(-180.f, 180.f);
+			SpawnPositions.Add(SpawnPosition);
+
+		}		
 	}
+	return SpawnPositions;
 }
 
 bool ATiel::FindEmtyLocation(FVector& OutLocation, float Radius)
@@ -76,13 +93,13 @@ bool ATiel::FindEmtyLocation(FVector& OutLocation, float Radius)
 	return false;
 }
 
-void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint, float Rotation, float Scale)
+void ATiel::PlaceActor(TSubclassOf<AActor> ToSpown, FSpawnPosition SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpown);
-	Spawned->SetActorRelativeLocation(SpawnPoint);
+	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	Spawned->SetActorRotation(FRotator(0, Rotation, 0));
-	Spawned->SetActorScale3D(FVector(Scale,Scale,Scale));
+	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
+	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
 }
 void ATiel::BeginPlay()
 {
@@ -115,17 +132,6 @@ bool ATiel::CanSpawnAtLocation(FVector Location, float Radius)
 		FCollisionShape::MakeSphere(Radius)
 	);
 
-	//FColor ResultColor = HasHit ? FColor::Red : FColor::Green;//if it intersects, then the color red is otherwise green
-	//DrawDebugCapsule(
-	//	GetWorld(),
-	//	GlobalLocation,
-	//	0,
-	//	Radius,
-	//	FQuat::Identity,
-	//	ResultColor,
-	//	true, 
-	//	100);
-	
 	return !HasHit;
 }
 

@@ -4,8 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NavigationSystem.h"
 #include "GameFramework/Actor.h"
 #include "Tiel.generated.h"
+
+USTRUCT()
+struct FSpawnPosition
+{
+	GENERATED_USTRUCT_BODY()
+
+	FVector Location;
+	float Rotation;
+	float Scale;
+
+};
 
 class UActorPool;
 
@@ -44,9 +56,11 @@ public:
 private:
 	void PositionNavMeshBoundsVolume();
 
+	TArray<FSpawnPosition>RandomSpawnPosition( int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale);
+
 	bool FindEmtyLocation(FVector& OutLocation, float Radius);
 
-	void PlaceActor(TSubclassOf<AActor> ToSpown, FVector SpawnPoint, float Rotation, float Scale);
+	void PlaceActor(TSubclassOf<AActor> ToSpown, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
